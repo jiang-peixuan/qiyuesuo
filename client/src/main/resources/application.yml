@@ -1,0 +1,11 @@
+
+spring:
+  application:
+    name: client
+  thymeleaf:
+    cache: false
+    suffix: .html
+    encoding: UTF-8
+    prefix: classpath:/tempaltes/
+  resources:
+    static-locations: classpath:/templates/,classpath:/static/
