@@ -1,16 +1,25 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<form action="http://localhost:8080/ClientUpload" method="post" enctype="multipart/form-data">
+    文件上传1:<input type="file" name="file">
+    <input type="submit" value="上传">
+</form>
+<th>
+    <span th:text="${uuid}"/>
+</th>
 <body>
 <h1>文件列表</h1>
+<form action="http://localhost:8080/ClientUpload" method="post" enctype="multipart/form-data">
+    文件上传1:<input type="file" name="file">
+    <input type="submit" value="上传">
+</form>
 <table border="1px">
-    <!--不同的目录
-中（目录格式 yyyyMMdd），同时将文件大小、文件类型，原始文件名、创
-建时间、文件保存目录地址、文件加密数字信封等元数据记录至数据库中，
-同时将 UUID 返回给客户端-->
     <tr>
         <th>原始文件名</th>
         <th>新文件名</th>
@@ -20,25 +29,21 @@
         <th>文件加密数字信封</th>
         <th>文件保存时间</th>
     </tr>
-    <tr th:each="file,fileStat:${files}">
-        <th><span th:text="${file.oldName}"/></th>
-        <th><span th:text="${file.newName}"/></th>
-        <th><span th:text="${file.ext}"/></th>
-        <th><span th:text="${file.size}"/></th>
-        <th><span th:text="${file.path}"/></th>
-        <th><span th:text="${file.uploadTime}"/></th>
-        <td>
-            <a href="">下载</a>
-            <a href="">查看</a>
-            <a href="">删除</a>
-        </td>
-    </tr>
+    <!--/*@thymesVar id="files" type=""*/-->
+<!--    <tr th:each="file,fileStat:${files}">-->
+<!--        <th><span th:text="${file.oldName}"/></th>-->
+<!--        <th><span th:text="${file.newName}"/></th>-->
+<!--        <th><span th:text="${file.ext}"/></th>-->
+<!--        <th><span th:text="${file.size}"/></th>-->
+<!--        <th><span th:text="${file.path}"/></th>-->
+<!--        <th><span th:text="${file.uploadTime}"/></th>-->
+<!--        <td>-->
+<!--            <a href="">下载</a>-->
+<!--            <a href="">查看</a>-->
+<!--            <a href="">删除</a>-->
+<!--        </td>-->
+<!--    </tr>-->
 </table>
-<hr/>
-<h3>上传文件</h3>
-<form action="/upload" enctype="multipart/form-data">
-    <input type="file" name="aaa" >
-    <input type="submit" value="上传文件">
-</form>
+
 </body>
 </html>

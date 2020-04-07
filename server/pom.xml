@@ -64,7 +64,6 @@
             <groupId>org.apache.derby</groupId>
             <artifactId>derby</artifactId>
             <version>10.14.1.0</version>
-            <scope>test</scope>
         </dependency>
         <!--日志-->
         <dependency>
@@ -77,5 +76,13 @@
             <artifactId>apache-log4j-extras</artifactId>
             <version>1.2.17</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/top.jfunc.common/converter -->
+        <dependency>
+            <groupId>top.jfunc.common</groupId>
+            <artifactId>converter</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+
     </dependencies>
+
 </project>

@@ -2,6 +2,7 @@ package com.qiyuesuo.controller;
 
 import com.qiyuesuo.utils.ClientUploadTest;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,18 +14,20 @@ import org.springframework.web.multipart.MultipartFile;
 口获取文件详细信息返回给前端，响应前端的下载接口，从 Server 端下载
 文件，解密后返回给前端*/
 
-@RestController
+@Controller
 public class ClientFileUpload {
     /**
      * 前端上传文件，后端接收后构造post请求，调用外部文件上传接口
      */
     private static final Logger logger = Logger.getLogger(ClientFileUpload.class);
     @PostMapping(value = "ClientUpload")
-    public void ClientUpload(Model model, @RequestParam(value = "file") MultipartFile file) throws Exception {
-
+    public String ClientUpload(Model model, @RequestParam(value = "file") MultipartFile file) throws Exception {
         String url = "http://localhost:9090/server/ServerFileUpload";
-        ClientUploadTest.uploadFileTest(file,url);
-       logger.info("....................");
+        String uuid = ClientUploadTest.uploadFileTest(file, url);
+        System.out.println(uuid);
+        logger.info("....................");
+        model.addAttribute("uuid",uuid);
+        return "showAll";
     }
 }
 

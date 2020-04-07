@@ -2,6 +2,7 @@ package com.qyuesuo.servlet;
 
 import com.qyuesuo.utils.JDBCUtil;
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
@@ -14,81 +15,57 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+//http://localhost:9090/server/serverDownLoad?filename=1.txt
+@WebServlet("/serverDownLoadById")
 
-@WebServlet("/ServerDownLoad")
 public class ServerFileDownload extends HttpServlet {
-    @Override
-    protected void doGet(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
-       //1. 获取要下载的文件名
-        String uuid = request.getHeader("UUID");
-        //根据UUID获取该文件的存储位置
-        Statement statement = JDBCUtil.getStatement();
-        String path=null;
-        BufferedInputStream bufferedInputStream=null;
-        ServletOutputStream outputStream=null;
-        try {
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM t_file where UUID = 'uuid'");
-            while (resultSet.next()){
-                 path = resultSet.getString("path");
-            }
-            if(path!=null){
-                File file = new File(path);
-                /*获得文件名，并采用UTF-8编码方式进行编码，以解决中文问题*/
-                String filename = URLEncoder.encode(file.getName(), "UTF-8");
-                //设置文件的类型
-                String mimeType = this.getServletContext().getMimeType(filename);
-                response.setContentType(mimeType);
-                //设置http头信息中 的内容
-                response.addHeader("Content-Disposition","attachment:filename=\"" + filename + "\"" );
-                //设置文件的长度
-                int fileLength = (int)file.length();
-                response.setContentLength(fileLength);
-                if(fileLength>0){
-
-                        //创建输入流
-                        InputStream inStream = new FileInputStream(file);
-                        byte[] buf = new byte[4096];
-                        //创建输出流
-                        ServletOutputStream servletOS = response.getOutputStream();
-                        int readLength;
-                        //读取文件内容并写到response的输出流当中
-                        while(((readLength = inStream.read(buf))!=-1)){
-                            servletOS.write(buf, 0, readLength);
-                        }
-                        //关闭输入流
-                        inStream.close();
-                        //刷新输出缓冲
-                        servletOS.flush();
-                        //关闭输出流
-                        servletOS.close();
-                }
-
-                bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
-               outputStream = response.getOutputStream();
-                byte []bytes = new byte[102400];
-                int len;
-                while ((len=bufferedInputStream.read(bytes))!=-1){
-                    outputStream.write(bytes,0,len);
-                }
-            }else {
-                System.out.println("文件不存在~！");
-                PrintWriter out = response.getWriter();
-                out.println("文件 \"" + path + "\" 不存在");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }finally {
-            outputStream.close();
-            bufferedInputStream.close();
-        }
-        String fileName = request.getParameter("fileName");
-        //2.获取servlet上下文
-        ServletContext servletContext = getServletContext();
-        InputStream resourceAsStream = servletContext.getResourceAsStream(fileName);
-    }
+    private static final Logger logger = Logger.getLogger(ServerFileDownload.class);
 
     @Override
     protected void doPost(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
+        //1. 获取要下载的文件名
+        String uuid = request.getParameter("filename");
+        //2.根据UUID获取该文件的存储位置
+        Statement statement = JDBCUtil.getStatement();
+        String realPath = null;
+        BufferedInputStream bufferedInputStream = null;
+        ServletOutputStream outputStream = null;
+        FileInputStream fileInputStream = null;
+        try {
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM t_file where newName = '" + uuid + "'");
+            logger.info("SELECT * FROM t_file where newName = '" + uuid + "'");
+            while (resultSet.next()) {
+                realPath = resultSet.getString("path");
+            }
+            //设置响应头
+            //设置响应头类型 content-type
+            String mimeType = this.getServletContext().getMimeType(uuid);
+            response.setContentType(mimeType);
+            response.setCharacterEncoding("UTF-8");
+            //设置响应头打开方式content-disposition
+            response.setHeader("content-disposition", "attachment;filename=" + "uuid");
+            try {
+                fileInputStream = new FileInputStream(realPath + "\\" + uuid);
+                outputStream = response.getOutputStream();
+                byte[] bytes = new byte[1024000];
+                int len = 0;
+                while ((len = fileInputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, len);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (fileInputStream != null) {
+                    fileInputStream.close();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    protected void doGet(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, IOException {
+        this.doPost(request, response);
     }
 }

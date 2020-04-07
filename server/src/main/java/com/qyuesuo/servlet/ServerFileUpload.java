@@ -48,8 +48,8 @@ public class ServerFileUpload extends HttpServlet {
             String oldName = cds[2].substring(cds[2].indexOf("=") + 1).substring(cds[2].lastIndexOf("//") + 1).replace("\"", "");
             String ext = oldName.substring(oldName.lastIndexOf(".") + 1);
             long fileSize = part.getSize();
-            UUID uuid = UUID.randomUUID();
-            String newName = uuid+ext;
+            String uuid = UUID.randomUUID().toString();
+            String newName = uuid+"."+ext;
             //设置存放的绝对路径
             String path = this.getServletContext().getRealPath("/");
             String storyFile = new SimpleDateFormat("yyyyMMdd").format(new Date());//目录
@@ -63,27 +63,29 @@ public class ServerFileUpload extends HttpServlet {
             //将原文件名，新文件名，文件类型，存储路径保存进数据库
             try {
                 Statement statement = JDBCUtil.getStatement();
-                statement.executeUpdate("insert into t_file3(oldName,newName,ext,path,size)VALUES(oldName,newName,ext,realPath,fileSize)");
+                statement.executeUpdate("insert into t_file(oldName,newName,ext,path,size)VALUES('"+oldName+"','"+newName+"','"+ext+"','"+realPath+"','"+fileSize+"')");
             } catch (SQLException e) {
                 e.printStackTrace();
-                logger.info("insert into t_file3(oldName,newName,ext,path,size)VALUES(oldName,newName,ext,realPath,fileSize)");
+                logger.info("insert into t_file(oldName,newName,ext,path,size)VALUES(oldName,newName,ext,realPath,fileSize)");
             } finally {
               JDBCUtil.close();
             }
             logger.info("文件存入数据库。。");
+            logger.info("path："+path);
             //将文件写入硬盘
             InputStream is = part.getInputStream();
-            commonFileProcess(newName, is);
+            commonFileProcess(newName, is,realPath);
             return newName;
         }
         return null;
     }
 
-    private void commonFileProcess(String filename, InputStream is) {
+    private void commonFileProcess(String filename, InputStream is,String realPath) {
         BufferedOutputStream fos = null;
         try {
-
-            fos =new BufferedOutputStream( new FileOutputStream(new File(getClass().getResource("/").getPath() + filename)));
+//                String s1 = getClass().getResource("/").getPath() + filename;
+            logger.info(realPath+"\\"+filename);
+            fos =new BufferedOutputStream( new FileOutputStream(new File(realPath+"\\"+filename)));
             int len = 0;
             byte []bytes = new byte[102400];
             while ((len = is.read(bytes)) != -1) {
