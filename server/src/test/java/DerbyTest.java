@@ -1,5 +1,3 @@
-package com.qyuesuo.servlet;
-
 import com.qyuesuo.utils.JDBCUtil;
 
 import java.sql.*;

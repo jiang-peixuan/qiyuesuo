@@ -1,0 +1,50 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>文件列表</title>
+</head>
+<body>
+
+<div style="margin: 50px auto; width: 1000px; text-align: center;">
+    <form action="http://localhost:8080/ClientUpload" enctype="multipart/form-data" method="post">
+        <input type="file" name="file">
+        <input type="submit" value="上传">
+    </form>
+</div>
+
+<div style="margin: 50px auto; width: 1000px; text-align: center;">
+    <form action="http://localhost:8080/clientFileFind"  method="get">
+        <input type="submit" value="查看所有">
+    </form>
+</div>
+
+<table width="1000" style="margin: 50px auto;" border="1px solid #222">
+
+    <tr>
+        <th>原始文件名</th>
+        <th>新文件名</th>
+        <th>文件类型</th>
+        <th>文件大小</th>
+        <th>文件保存目录地址</th>
+        <th>文件加密数字信封</th>
+        <th>文件保存时间</th>
+    </tr>
+    <tr th:each="file,fileStat:${files}">
+        <th><span th:text="${file.oldName}"/></th>
+        <th><span th:text="${file.uuid}"/></th>
+        <th><span th:text="${file.ext}"/></th>
+        <th><span th:text="${file.size}"/></th>
+        <th><span th:text="${file.path}"/></th>
+        <th><span th:text="${file.digitalEnvelope}"/></th>
+        <th><span th:text="${file.uploadTime}"/></th>
+        <td>
+            <a target="_blank" th:href="'http://localhost:8080/clientDownload?uuid='+${file.uuid}">下载</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

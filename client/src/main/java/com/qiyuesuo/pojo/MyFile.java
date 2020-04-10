@@ -2,7 +2,7 @@ package com.qiyuesuo.pojo;
 
 import java.util.Date;
 
-public class File {
+public class MyFile {
     private Integer id;
     private String oldName;
     private String newName;
@@ -10,16 +10,26 @@ public class File {
     private String path;
     private String size;
     private Date  uploadTime;
+    private  String digitalEnvelope;
 
-    public File() {
+    public MyFile() {
     }
 
-    public File(String oldName, String newName, String ext, String path, String size) {
+    public MyFile(String oldName, String newName, String ext, String path, String size) {
         this.oldName = oldName;
         this.newName = newName;
         this.ext = ext;
         this.path = path;
         this.size = size;
+    }
+
+    public MyFile(String oldName, String newName, String ext, String path, String size, String digitalEnvelope) {
+        this.oldName = oldName;
+        this.newName = newName;
+        this.ext = ext;
+        this.path = path;
+        this.size = size;
+        this.digitalEnvelope = digitalEnvelope;
     }
 
     public Integer getId() {
@@ -71,6 +81,14 @@ public class File {
     }
 
 
+    public String getDigitalEnvelope() {
+        return digitalEnvelope;
+    }
+
+    public void setDigitalEnvelope(String digitalEnvelope) {
+        this.digitalEnvelope = digitalEnvelope;
+    }
+
     public Date getUploadTime() {
         return uploadTime;
     }
@@ -81,7 +99,7 @@ public class File {
 
     @Override
     public String toString() {
-        return "File{" +
+        return "MyFile{" +
                 "id=" + id +
                 ", oldName='" + oldName + '\'' +
                 ", newName='" + newName + '\'' +
@@ -89,6 +107,7 @@ public class File {
                 ", path='" + path + '\'' +
                 ", size='" + size + '\'' +
                 ", uploadTime=" + uploadTime +
+                ", digitalEnvelope='" + digitalEnvelope + '\'' +
                 '}';
     }
 }

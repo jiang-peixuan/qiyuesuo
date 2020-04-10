@@ -1,4 +1,4 @@
-package com.qiyuesuo.utils;
+package com.qiyuesuo.controller;
 
 import org.apache.http.client.methods.HttpPost;
 import org.springframework.core.io.FileSystemResource;
@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 
 
-public class ClientUploadTest {
+public class UploadUtil {
     public static File multipartFileToFile(MultipartFile file, String fileName) {
         if (file != null) {
             File conventFile = new File(fileName);
@@ -29,7 +29,6 @@ public class ClientUploadTest {
     }
 
     public static String uploadFileTest(MultipartFile file, String url_str) {
-//        String uuid = UUID.randomUUID().toString();
         String originalFilename = file.getOriginalFilename();
         ResponseEntity<String> stringResponseEntity =null;
         File tempFile = multipartFileToFile(file,  "F:\\com.qiyuesuo.qiyuesuo\\client\\src\\test\\"+originalFilename);

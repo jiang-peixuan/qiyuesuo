@@ -10,16 +10,38 @@ public class MyFile {
     private String path;
     private String size;
     private Date  uploadTime;
+    private  String digitalEnvelope;
 
-    public MyFile() {
+    public String getDigitalEnvelope() {
+        return digitalEnvelope;
     }
 
-    public MyFile(String oldName, String newName, String ext, String path, String size) {
+    public void setDigitalEnvelope(String digitalEnvelope) {
+        this.digitalEnvelope = digitalEnvelope;
+    }
+
+    public MyFile(Integer id, String oldName, String newName, String ext, String path, String size, Date uploadTime, String digitalEnvelope) {
+        this.id = id;
         this.oldName = oldName;
         this.newName = newName;
         this.ext = ext;
         this.path = path;
         this.size = size;
+        this.uploadTime = uploadTime;
+        this.digitalEnvelope = digitalEnvelope;
+    }
+
+    public MyFile() {
+    }
+
+    public MyFile(String oldName, String newName, String ext, String path, String size, Date uploadTime, String digitalEnvelope) {
+        this.oldName = oldName;
+        this.newName = newName;
+        this.ext = ext;
+        this.path = path;
+        this.size = size;
+        this.uploadTime = uploadTime;
+        this.digitalEnvelope = digitalEnvelope;
     }
 
     public Integer getId() {
@@ -81,7 +103,7 @@ public class MyFile {
 
     @Override
     public String toString() {
-        return "File{" +
+        return "MyFile{" +
                 "id=" + id +
                 ", oldName='" + oldName + '\'' +
                 ", newName='" + newName + '\'' +
@@ -89,6 +111,7 @@ public class MyFile {
                 ", path='" + path + '\'' +
                 ", size='" + size + '\'' +
                 ", uploadTime=" + uploadTime +
+                ", digitalEnvelope='" + digitalEnvelope + '\'' +
                 '}';
     }
 }
