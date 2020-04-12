@@ -29,12 +29,15 @@ public class RSAUtil {
         keyPairGen.initialize(1024);
         KeyPair keyPair = keyPairGen.generateKeyPair();
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        System.out.println("publickey:"+publicKey);
         RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        System.out.println("privateKey:"+privateKey);
         map.put("public", publicKey);
         map.put("private", privateKey);
         System.out.println("new File(\"\").getPath() = " + new File("").getPath());
-        File pubKey = new File("key/public.key");
-        File priKey = new File("key/private.key");
+        String pathname = Thread.currentThread().getContextClassLoader().getResource("/").getPath()+"key/public.key";
+        File pubKey = new File("key\\public.key");
+        File priKey = new File("key\\private.key");
         PrintStream printStream = null;
         try {
             printStream = new PrintStream(pubKey);
@@ -72,11 +75,10 @@ public class RSAUtil {
         }
     }
 
-    public static RSAPublicKey getPublicKey() throws IOException {
-        System.out.println();
-        System.out.println("new File(\"\").getPath() = " + new File("").getAbsolutePath());
+    public static RSAPublicKey getPublicKey() throws IOException, NoSuchAlgorithmException {
 
-        String pathname = Thread.currentThread().getContextClassLoader().getResource("/").getPath()+"key/public.key";
+        System.out.println("new File(\"\").getPath() = " + new File("").getAbsolutePath());
+        String pathname = "key\\public.key";
         System.out.println("pathname = " + pathname);
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(pathname)));
         bufferedReader.readLine();

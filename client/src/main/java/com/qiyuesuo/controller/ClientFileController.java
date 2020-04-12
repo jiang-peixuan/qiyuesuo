@@ -1,9 +1,12 @@
 package com.qiyuesuo.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.qiyuesuo.pojo.MyFile;
 import com.qiyuesuo.utils.AESUtil;
 import com.qiyuesuo.utils.RSAUtil;
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -15,12 +18,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URLEncoder;
+import java.security.interfaces.RSAPrivateKey;
+import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 
 /*
@@ -42,9 +45,10 @@ public class ClientFileController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setContentType(MediaType.parseMediaType("multipart/form-data; charset=UTF-8"));
         // X-SID :随机数
-        String sid = getRandomString(10);
+//        String sid = getRandomString(10);
+        String sid = UUID.randomUUID().toString().replaceAll("-", "");
         // X-Signature :RSA算法 使用私钥对sid加密
-        String signature = RSAUtil.encryptByPriKey(sid, PRIVATE_KEY);
+        String signature = RSAUtil.getSignByPrivateKey(sid).replaceAll("\n", "");
         headers.add("X-SID", sid);
         headers.add("X-Signature", signature);
         return headers;
@@ -52,51 +56,63 @@ public class ClientFileController {
 
     @PostMapping(value = "/ClientUpload")
     public String ClientUpload(Model model, @RequestParam(value = "file") MultipartFile file) throws Exception {
-        builderHeader();
-        String url = "http://localhost:9090/server/ServerFileUpload";
-        String uuid = UploadUtil.uploadFileTest(file, url);
-        model.addAttribute("uuid", uuid);
+        if(file!=null){
+            builderHeader();
+            String url = "http://localhost:9090/server/ServerFileUpload";
+            String uuid = UploadUtil.uploadFileTest(file, url);
+            model.addAttribute("uuid", uuid);
+        }
         return "index";
     }
 
     @RequestMapping("/clientFileFindById")
-    public void clientFileFind(@PathVariable String uuid) throws Exception {
+    public String  clientFileFind(Model model,@RequestParam String uuid) throws Exception {
         builderHeader();
-        String url = "http://localhost:9090/server/serverFileFindById";
-        url = url + "?filename=" + uuid;
-        RestTemplate restTemplate = new RestTemplate();
-        String forObject = restTemplate.getForObject(url, String.class);
-        System.out.println(forObject);
+        uuid="ad29bfe9fcc141738697065775586d9f..xlsx";
+        MyFile oneById = findOneById(uuid);
+        System.out.println(oneById);
+        MyFile myfile = new MyFile();
+        model.addAttribute("file1",myfile);
+        System.out.println(myfile.toString());
+        return "index";
     }
 
     @RequestMapping("/clientFileFind")
-    public static String clientFileFind() throws Exception {
+    public static String clientFileFind(Model model) throws Exception {
         builderHeader();
         String url = "http://localhost:9090/server/serverFileFind";
         RestTemplate restTemplate = new RestTemplate();
         String forObject = restTemplate.getForObject(url, String.class);
-        System.out.println(forObject);
+        Gson gson = new Gson();
+        List<MyFile> myFiles = gson.fromJson(forObject, new TypeToken<List<MyFile>>(){}.getType());
+        model.addAttribute("myFiles",myFiles);
         return "index";
     }
 
     @GetMapping("/clientDownload")
-    public   void index(@RequestParam("uuid") String uuid, HttpServletResponse response) throws Exception {
+    public   void clientDownload(@RequestParam("newName") String newName, HttpServletResponse response) throws Exception {
 
         // 设置header
-        HttpHeaders headers = builderHeader();
+       builderHeader();
         MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();
-        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(form, headers);
-        MyFile myFile = null;
+        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(form, null);
         RestTemplate restTemplate = new RestTemplate();
         // 2.向Server端请求下载
-        ResponseEntity<Resource> result = restTemplate.exchange("http://localhost:9090/server/serverDownLoad?MyFilename=" + uuid, HttpMethod.GET, httpEntity, Resource.class);
+        String url ="http://localhost:9090/server/serverDownLoad?uuid="+newName;
+        ResponseEntity<Resource> result = restTemplate.exchange(url, HttpMethod.GET, httpEntity, Resource.class);
         if (result.getStatusCode() == HttpStatus.OK) {
             InputStream in = result.getBody().getInputStream();
-            response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(uuid, "UTF-8"));
+            response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(newName, "UTF-8"));
             OutputStream out = response.getOutputStream();
             // 3.解密，输出到浏览器
-            String key = RSAUtil.decryptByPriKey(myFile.getDigitalEnvelope(), PRIVATE_KEY);
-            AESUtil.decryptFileAndOutput(key, in, out);
+            //我们需要拿到数组信封，对其解密！！得到AES
+            MyFile myFile = findOneById(newName);
+            //获取私钥
+            RSAPrivateKey privateKey = RSAUtil.getPrivateKey();
+            String AESkey = RSAUtil.decryptByPrivateKey(myFile.getDigitalEnvelope(), privateKey);
+            logger.info("得到AESkey:"+AESkey);
+            //使用AES对文件解密
+            AESUtil.decryptFileAndOutput(AESkey, in, out);
         }
     }
 
@@ -127,6 +143,22 @@ public class ClientFileController {
         }
     }
 
+    //下载的时候，需要数字信封。
+    public  MyFile  findOneById(String uuid) throws Exception {
+        builderHeader();
+        String url = "http://localhost:9090/server/serverFileFindById";
+        url = url + "?filename=" + uuid;
+        RestTemplate restTemplate = new RestTemplate();
+        String forObject = restTemplate.getForObject(url, String.class);
+        Gson gson = new Gson();
+        MyFile myfile = gson.fromJson(forObject, MyFile.class);
+        return myfile;
+    }
+
+
+    @Test
+    public void  test123() throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(new File("key\\private.key")));
+        System.out.println("uu");
+    }
 }
-
-

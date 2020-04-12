@@ -1,2 +1,8 @@
+com\qyuesuo\service\FileService.class
+com\qyuesuo\dao\FileDao.class
+com\qyuesuo\pojo\MyFile.class
+com\qyuesuo\service\Impl\FileServiceImpl.class
 com\qyuesuo\utils\RSAUtil.class
+com\qyuesuo\servlet\ServerFileFind.class
+com\qyuesuo\servlet\ServerFileFindById.class
 com\qyuesuo\AuthFilter\ServerSign.class

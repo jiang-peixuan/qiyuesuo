@@ -1,6 +1,4 @@
 package com.qyuesuo.service.Impl;
-
-
 import com.qyuesuo.dao.FileDao;
 import com.qyuesuo.pojo.MyFile;
 import com.qyuesuo.service.FileService;
@@ -35,7 +33,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public String fileUpload(HttpServletRequest request) {
 
-        MyFile fileInfoModel = new MyFile();
+        MyFile myfile = new MyFile();
         //
         //从request 中获取文件
         Part part = null;
@@ -71,7 +69,7 @@ public class FileServiceImpl implements FileService {
         AESCrpyt aesCrpyt = new AESCrpyt();
         // 加密后保存新路径
         aesCrpyt.crypt(TEMP_PATH, path, uukey);
-        //RSA加密
+        //RSA对AES加密 数字信封
         String mi = null;
         try {
             RSAPublicKey pubKey = RSAUtil.getPublicKey();
@@ -79,19 +77,20 @@ public class FileServiceImpl implements FileService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //保存fileInfo 信息
-        fileInfoModel.setDigitalEnvelope(mi);
-        fileInfoModel.setNewName(newName);
-        fileInfoModel.setOldName(oldName);
-        fileInfoModel.setExt(ext);
-        fileInfoModel.setSize(String.valueOf(fileSize));
-        fileInfoModel.setPath(path);
+        //保存file息
+        myfile.setDigitalEnvelope(mi);
+        myfile.setNewName(newName);
+        myfile.setOldName(oldName);
+        myfile.setExt(ext);
+        myfile.setSize(String.valueOf(fileSize));
+        myfile.setPath(path);
+        myfile.setDigitalEnvelope(mi);
         //入库
-        fileDao.save(fileInfoModel);
+        fileDao.save(myfile);
         //删除临时文件
         File file = new File(TEMP_PATH);
         file.delete();
-        return fileInfoModel.getNewName();
+        return myfile.getNewName();
     }
 
     /**

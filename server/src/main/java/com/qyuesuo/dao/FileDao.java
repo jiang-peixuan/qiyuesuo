@@ -3,8 +3,11 @@ package com.qyuesuo.dao;
 import com.qyuesuo.pojo.MyFile;
 import com.qyuesuo.utils.JDBCUtil;
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +29,8 @@ public class FileDao {
     }
     
     public List<MyFile> queryTen(){
+        java.util.Date uploadTime = null;
+        String format= null;
         List<MyFile> list = new ArrayList();
         ResultSet resultSet = null;
         String sql = "select * from t_file ORDER BY uploadTime DESC";
@@ -42,7 +47,12 @@ public class FileDao {
                 String digitalEnvelope = resultSet.getString("digitalEnvelope");
                 String date = resultSet.getString("uploadTime");
                 System.out.println(date);
-                Date uploadTime = new Date(Long.valueOf(date));
+                SimpleDateFormat simpleDateFormat =new SimpleDateFormat("yyyy-MM-dd HH:mm:SSS");
+                try {
+                  uploadTime = simpleDateFormat.parse(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 MyFile myFile = new MyFile(oldName,newName,ext,path,size,uploadTime,digitalEnvelope);
                 list.add(myFile);
             }
@@ -57,6 +67,7 @@ public class FileDao {
     }
 
 
+    @Test
     public MyFile findById(String uuid){
        ResultSet resultSet = null;
         MyFile myFile =null;
@@ -71,13 +82,16 @@ public class FileDao {
                 String size = resultSet.getString("size");
                 String digitalEnvelope = resultSet.getString("digitalEnvelope");
                 String date = resultSet.getString("uploadTime");
-                Date uploadTime = new Date(Long.valueOf(date));
-                 myFile = new MyFile(oldName,newName,ext,path,size,uploadTime,digitalEnvelope);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:SSS");
+                java.util.Date parse = simpleDateFormat.parse(date);
+                myFile = new MyFile(oldName,newName,ext,path,size,parse,digitalEnvelope);
             }
         } catch (SQLException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-        }finally {
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } finally {
             JDBCUtil.close(resultSet);
         }
         return myFile;

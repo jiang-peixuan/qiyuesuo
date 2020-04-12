@@ -7,14 +7,18 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>文件列表</title>
 </head>
-<body>
 
+<body>
+<hr/>
 <div style="margin: 50px auto; width: 1000px; text-align: center;">
     <form action="http://localhost:8080/ClientUpload" enctype="multipart/form-data" method="post">
         <input type="file" name="file">
         <input type="submit" value="上传">
+        <span th:text="${uuid}"/>
     </form>
+    <br/>
 </div>
+<hr/>
 
 <div style="margin: 50px auto; width: 1000px; text-align: center;">
     <form action="http://localhost:8080/clientFileFind"  method="get">
@@ -22,8 +26,48 @@
     </form>
 </div>
 
-<table width="1000" style="margin: 50px auto;" border="1px solid #222">
 
+<!--<table width="1000" style="margin: 50px auto;" border="1px solid #222">-->
+<!--    <tr>-->
+<!--        <th>原始文件名</th>-->
+<!--        <th>新文件名</th>-->
+<!--        <th>文件类型</th>-->
+<!--        <th>文件大小</th>-->
+<!--        <th>文件保存目录地址</th>-->
+<!--        <th>文件加密数字信封</th>-->
+<!--        <th>文件保存时间</th>-->
+<!--    </tr>-->
+<!--    <tr th:each="file,fileStat:${myFiles}">-->
+<!--        <th><span th:text="${file.oldName}"/></th>-->
+<!--        <th><span th:text="${file.newName}"/></th>-->
+<!--        <th><span th:text="${file.ext}"/></th>-->
+<!--        <th><span th:text="${file.size}"/></th>-->
+<!--        <th><span th:text="${file.path}"/></th>-->
+<!--        <th><span th:text="${file.digitalEnvelope}"/></th>-->
+<!--        <th><span th:text="${file.uploadTime}"/></th>-->
+<!--        <td>-->
+<!--            <a target="_blank" th:href="'http://localhost:8080/clientDownload?newName='+${file.newName}">下载</a>-->
+<!--        </td>-->
+<!--    </tr>-->
+<!--</table>-->
+
+
+
+<!--<div style="margin: 50px auto; width: 1000px; text-align: center;">-->
+<!--    <br/>-->
+<!--    <a th:href="'http://localhost:8080/clientFileFindById?newName='+${uuid}">查询</a>-->
+<!--    <hr/>-->
+<!--    <div th:object="${file1}">-->
+<!--        <p th:text="'原始文件名：' + *{oldName}"/>-->
+<!--        <p th:text="'新文件名：' + *{newName}"/>-->
+<!--        <p th:text="'文件类型：' + *{ext}"/>-->
+<!--        <p th:text="'文件大小：' + *{size}"/>-->
+<!--        <p th:text="'文件保存目录地址：' + *{path}"/>-->
+<!--        <p th:text="'文件加密数字信封：' + *{digitalEnvelope}"/>-->
+<!--        <p th:text="'文件保存时间：' + *{uploadTime}"/>-->
+<!--    </div>-->
+<!--</div>-->
+<table width="500" style="margin: 50px auto;" border="1px solid #222">
     <tr>
         <th>原始文件名</th>
         <th>新文件名</th>
@@ -33,16 +77,16 @@
         <th>文件加密数字信封</th>
         <th>文件保存时间</th>
     </tr>
-    <tr th:each="file,fileStat:${files}">
+    <tr th:each="file,fileStat:${myFiles}">
         <th><span th:text="${file.oldName}"/></th>
-        <th><span th:text="${file.uuid}"/></th>
+        <th><span th:text="${file.newName}"/></th>
         <th><span th:text="${file.ext}"/></th>
         <th><span th:text="${file.size}"/></th>
         <th><span th:text="${file.path}"/></th>
         <th><span th:text="${file.digitalEnvelope}"/></th>
         <th><span th:text="${file.uploadTime}"/></th>
         <td>
-            <a target="_blank" th:href="'http://localhost:8080/clientDownload?uuid='+${file.uuid}">下载</a>
+            <a target="_blank" th:href="'http://localhost:8080/clientDownload?newName='+${file.newName}">下载</a>
         </td>
     </tr>
 </table>

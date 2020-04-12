@@ -32,6 +32,16 @@ public class MyFile {
         this.digitalEnvelope = digitalEnvelope;
     }
 
+    public MyFile(String oldName, String newName, String ext, String path, String size, Date uploadTime, String digitalEnvelope) {
+        this.oldName = oldName;
+        this.newName = newName;
+        this.ext = ext;
+        this.path = path;
+        this.size = size;
+        this.uploadTime = uploadTime;
+        this.digitalEnvelope = digitalEnvelope;
+    }
+
     public Integer getId() {
         return id;
     }
