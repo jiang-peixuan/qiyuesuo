@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.crypto.Cipher;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
@@ -128,10 +129,9 @@ public class ClientFileController {
             String AESkey =s;
             logger.info("得到AESkey==================>" + AESkey);
             //使用AES对文件解密
-
             AESCipher aesCipher = new AESCipher();
-
-            File file = aesCipher.decryptFile(in, out, "1234567890abcdef");
+            aesCipher.initAESCipher(AESkey, Cipher.DECRYPT_MODE);
+            File file = aesCipher.decryptFile(in, out, AESkey);
         }
     }
 
