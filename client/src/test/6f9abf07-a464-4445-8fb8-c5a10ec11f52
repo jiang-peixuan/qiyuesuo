@@ -1,0 +1,130 @@
+select distinct job_id
+from employees
+
+# 显示数empolyees 的全部列，给个列之间有逗号分隔，列头显示成out_put
+
+
+#1
+
+select salary,last_name
+from employees
+where salary <18000 
+and commiss_pct is null;
+
+select * from  employees
+where job_id <> 'IT'  # <> != 
+or salary =1200
+
+
+#查看部门表的结构 
+desc departments;
+
+
+# 查看部门departments 表中涉及了哪些位置编号
+select (distinct)location_id 
+from departments;
+
+#面试题
+#select * from employees; 和
+#select * from employees where commission like '%%' and last_name like '%%'结果是否一样
+
+#不一样，应为可能出现null
+
+#查询员工中第二个字符为_的员工名
+select last_name 
+from employees 
+where last_name like '_\_%';  #这里使用\转义
+#或者使用escape,指定某个字符为转义字符
+where last_name like '_$_%' escape '$';#那么这里$就相当‘\’，是一个转义字符
+
+
+
+
+#显示员工表 的最大工资，工资平均值
+
+select max(salary),avg(salary)
+from salary;
+
+
+
+select employee_id ,job_id ,last_name
+from employees 
+order by department_id desc,salary asc;
+
+select * 
+from employees
+where job_id like '%a%e%',
+
+#显示当前日期，以及去前后空格，截取子字符串 的函数
+select now();
+select trim(字符 from '');
+select substr(str,startIndex);
+select substr(str,startIndex,length);
+
+#查询所有学院的用户名
+select substr(email,1,instr(email,'@')-1)
+from stuinfon;
+
+#查询男生女生的个数
+select age, count(*)
+from stuinfo
+GROUP BY age;
+
+select name,grageName
+from stuinfo,grade
+where age>18 
+and stuinfo.gradeid = grade.id
+
+
+#查询哪个年级的学生最小年龄大于20岁
+#1,每个年级的最小年龄
+#2,在1的结果上进行筛选
+select * from grade
+
+select min(age)，grade_id
+from stuinfo 
+GROUP BY grade
+
+having min(age)>20;
+
+select 查询列表
+
+from 表
+
+链接类型 join 表 2
+
+
+
+select count(*)
+from stu
+GROUP BY majorId
+
+
+select avg(score),max(score)
+from stu
+Group by sno;
+
+select sno,sname
+from stua
+where sname like '张%'
+group by sno
+having min(score)>60;
+
+#查询和张崔山的一样专业的学生的最低分
+select id from  
+
+
+#按邮箱  的位数分组，查询每组的学生位数
+select count(*) ,length(email)
+from student
+group by LENGTH(email);
+
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,6 @@
 package com.qyuesuo.pojo;
 
+import java.io.File;
 import java.util.Date;
 
 public class MyFile {

@@ -1,17 +1,19 @@
 package com.qyuesuo.service.Impl;
+
 import com.qyuesuo.dao.FileDao;
 import com.qyuesuo.pojo.MyFile;
 import com.qyuesuo.service.FileService;
-import com.qyuesuo.utils.AESCrpyt;
-import com.qyuesuo.utils.RSAUtil;
+import com.qyuesuo.utils.AESCipher;
+import com.qyuesuo.utils.RSAKeyPair;
 import org.apache.log4j.Logger;
 
+import javax.crypto.Cipher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 import java.io.*;
-import java.security.interfaces.RSAPublicKey;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -53,27 +55,34 @@ public class FileServiceImpl implements FileService {
         String[] cds = cd.split(";");
         String oldName = cds[2].substring(cds[2].indexOf("=") + 1).substring(cds[2].lastIndexOf("//") + 1).replace("\"", "");
         long fileSize = part.getSize();
-        String uuid = UUID.randomUUID().toString().replaceAll("-","");
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
 
         // 文件信息
         String ext = oldName.substring(oldName.lastIndexOf("."));
-        String newName = uuid + "." + ext;
+        String newName = uuid + ext;
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String path = BASE_PATH + sdf.format(new Date()) + File.separator + uuid;
         // 将文件存储为临时文件
-       saveFile(in, TEMP_PATH);
+        saveFile(in, TEMP_PATH);
         //对临时文件进行 AES 加密
         //创建AES key
         String uukey = UUID.randomUUID().toString().replaceAll("-", "");
-        AESCrpyt aesCrpyt = new AESCrpyt();
+//        byte [] uukey = "1234567890abcdef".getBytes("utf-8");
+//        AESCrpyt aesCrpyt = new AESCrpyt();
         // 加密后保存新路径
-        aesCrpyt.crypt(TEMP_PATH, path, uukey);
+        AESCipher aesCipher = new AESCipher();
+        aesCipher.initAESCipher(uukey, Cipher.ENCRYPT_MODE);
+        File srcFile = new File(TEMP_PATH);
+        File destFile = new File(path);
+        aesCipher.encryptFile(srcFile, destFile, uukey);
         //RSA对AES加密 数字信封
         String mi = null;
         try {
-            RSAPublicKey pubKey = RSAUtil.getPublicKey();
-            mi = RSAUtil.encryptByPublicKey(uukey, pubKey);
+            byte[] bytes = uukey.getBytes();
+            byte[] xinfeng = RSAKeyPair.encrypt(bytes);
+            mi = Base64.getUrlEncoder().encodeToString(xinfeng);
+            logger.info("mi=========>" + mi);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,12 +93,11 @@ public class FileServiceImpl implements FileService {
         myfile.setExt(ext);
         myfile.setSize(String.valueOf(fileSize));
         myfile.setPath(path);
-        myfile.setDigitalEnvelope(mi);
         //入库
         fileDao.save(myfile);
         //删除临时文件
         File file = new File(TEMP_PATH);
-        file.delete();
+//        file.delete();
         return myfile.getNewName();
     }
 
@@ -129,7 +137,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<MyFile>  queryTen() {
+    public List<MyFile> queryTen() {
         return fileDao.queryTen();
     }
 
@@ -143,7 +151,7 @@ public class FileServiceImpl implements FileService {
                 file.getParentFile().mkdirs();
             }
             file.createNewFile();
-            OutputStream  os = new FileOutputStream(file);
+            OutputStream os = new FileOutputStream(file);
             while ((len = inputStream.read(bs)) != -1) {
                 os.write(bs, 0, len);
             }
